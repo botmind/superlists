@@ -11,15 +11,15 @@ class NewVisitorTest(unittest.TestCase):
 		self.browser.quit()
 
 	def test_can_start_a_list_and_retrieve_it_later(self):
-		# Edith has heard about a cool new online to-do app. She goes
+		# Edith has heard about a cool new online app with famous quotes. She goes
 		# to check out its homepage
 		self.browser.get('http://localhost:8000')
 
-		# She notices the page title and header mention to-do lists
-		self.assertIn('To-Do', self.browser.title)
+		# She notices the page title and header mention wise words
+		self.assertIn('Wise Words', self.browser.title)
 		self.fail('Finish the test!')
 
-		# She is invited to enter a to-do item straight away
+		# She is invited to enter a new quotation straight away
 
 		# She types "Buy peacock feathers" into a text box (Edith's hobby
 		# is tying fly-fishing lures)
