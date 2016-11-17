@@ -35,12 +35,19 @@ class NewVisitorTest(unittest.TestCase):
 
 		table = self.browser.find_element_by_id('id_quote_table')
 		rows = table.find_elements_by_tag_name('tr')
-		self.assertTrue(any(row.text == 'I think, therefore I am.' for row in rows), "New quote did not appear in table")
+		self.assertIn('I think, therefore I am.', [row.text for row in rows])
 
-		# There is still a text box inviting her to add another item. She
-		# enters "Use peacock feathers to make a fly" (Edith is very methodical)
+		# There is still a text box inviting her to add another quote. She
+		# enters "Man is a rational animal."
+		inputbox = self.browser.find_element_by_id('id_new_quote')
+		inputbox.send_keys('Man is a rational animal.')
+		inputbox.send_keys(Keys.ENTER)
 
-		# The page updates again, and now shows both items on her list
+		# The page updates again, and now shows both quotes
+		table = self.browser.find_element_by_id('id_quote_table')
+		rows = table.find_elements_by_tag_name('tr')
+		self.assertIn('I think, therefore I am.', [row.text for row in rows])
+		self.assertIn('Man is a rational animal.', [row.text for row in rows])
 
 		# Edith wonders whether the site will remember her list. Then she sees
 		# that the site has generated a unique URL for her -- there is some

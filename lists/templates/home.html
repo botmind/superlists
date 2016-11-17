@@ -4,7 +4,13 @@
 	</head>
 	<body>
 		<h1>Wise Words</h1>
-		<input id="id_new_quote" placeholder="Enter a new quote"></input>
-		<table id="id_quote_table"></table>
+		<form method="POST">
+			<input name="quote_text" id="id_new_quote" placeholder="Enter a new quote"></input>	
+			{% csrf_token %}
+		</form>
+
+		<table id="id_quote_table">
+			<tr><td>{{ new_quote_text }}</td></tr>
+		</table>
 	</body>
 </html>
