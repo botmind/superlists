@@ -1,6 +1,11 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from lists.models import Quote
 
 # Create your views here.
 def home_page(request):
-	return render(request, 'home.html', {'new_quote_text': request.POST.get('quote_text',''),})
+	if request.method == 'POST':
+		Quote.objects.create(text=request.POST['quote_text'])
+		return redirect('/')
+
+	quotes = Quote.objects.all()
+	return render(request, 'home.html', {'quotes': quotes})

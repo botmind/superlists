@@ -10,7 +10,9 @@
 		</form>
 
 		<table id="id_quote_table">
-			<tr><td>{{ new_quote_text }}</td></tr>
+			{% for quote in quotes %}
+				<tr><td>{{ quote.text }}</td></tr>
+			{% endfor %}
 		</table>
 	</body>
 </html>

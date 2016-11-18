@@ -25,9 +25,34 @@ class HomePageTest(TestCase):
 
 		response = home_page(request)
 
-		self.assertIn('I think, therefore I am.', response.content.decode())
-		expected_html = render_to_string('home.html', {'new_quote_text': 'I think, therefore I am.'})
-		self.assertEqual(response.content.decode(), expected_html)
+		self.assertEqual(Quote.objects.count(), 1)
+		new_quote = Quote.objects.first()
+		self.assertEqual('I think, therefore I am.', new_quote.text)
+
+	def test_home_page_redirects_after_POST(self):
+		request = HttpRequest()
+		request.method = 'POST'
+		request.POST['quote_text'] = 'I think, therefore I am.'
+
+		response = home_page(request)
+
+		self.assertEqual(response.status_code, 302)
+		self.assertEqual(response['location'], '/')
+
+	def test_home_page_only_saves_items_when_necessary(self):
+		request = HttpRequest()
+		home_page(request)
+		self.assertEqual(Quote.objects.count(), 0)
+
+	def test_home_page_displays_all_list_items(self):
+		Quote.objects.create(text='quote 1')
+		Quote.objects.create(text='quote 2')
+
+		request = HttpRequest()
+		response = home_page(request)
+
+		self.assertIn('quote 1', response.content.decode())
+		self.assertIn('quote 2', response.content.decode())
 
 class QuoteModelTest(TestCase):
 	
