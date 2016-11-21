@@ -38,6 +38,8 @@ class NewVisitorTest(LiveServerTestCase):
 		# When she hits enter, the page updates, and now the page lists
 		# "I think, therefore I am."" as a new quote.
 		inputbox.send_keys(Keys.ENTER)
+		edith_list_url = self.browser.current_url
+		self.assertRegex(edith_list_url, '/quotes/.+')
 
 		self.check_for_row_in_list_table('I think, therefore I am.')
 
@@ -51,11 +53,33 @@ class NewVisitorTest(LiveServerTestCase):
 		self.check_for_row_in_list_table('I think, therefore I am.')
 		self.check_for_row_in_list_table('Man is a rational animal.')
 
-		# Edith wonders whether the site will remember her list. Then she sees
-		# that the site has generated a unique URL for her -- there is some
-		# explanatory text to that effect.
+		# A new user, Francis, comes to the site.
 
-		# She visits that URL - her to-do list is still there.
+		## We use a new session to make sure no information
+		## from Edith is coming through from cookies, etc.
 
-		# Satisfied, she goes back to sleep
-		self.fail('Finish the test!')
+		self.browser.quit()
+		self.browser = webdriver.Firefox()
+
+		# Francis visits the home page.  There is no sign of Edith's quotes.
+		self.browser.get(self.live_server_url)
+		page_text = self.browser.find_element_by_tag_name('body').text
+		self.assertNotIn('I think, therefore I am.', page_text)
+		self.assertNotIn('Man is a rational animal.', page_text)
+
+		#Francis enters a new quote.
+		inputbox = self.browser.find_element_by_id('id_new_quote')
+		inputbox.send_keys('The pen is mightier than the sword.')
+		inputbox.send_keys(Keys.ENTER)
+
+		#Francis gets his own unique URL
+		francis_list_url = self.browser.current_url
+		self.assertRegex(francis_list_url, '/quotes/.+')
+		self.assertNotEqual(francis_list_url, edith_list_url)
+
+		#There is no trace of Edith's quotes
+		page_text = self.browser.find_element_by_tag_name('body').text
+		self.assertNotIn('I think, therefore I am.', page_text)
+		self.assertIn('The pen is mightier than the sword.', page_text)
+
+		#Satisfied, they both go to sleep
