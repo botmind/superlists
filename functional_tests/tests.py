@@ -1,8 +1,9 @@
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import unittest
 
-class NewVisitorTest(unittest.TestCase):
+
+class NewVisitorTest(LiveServerTestCase):
 
 	def setUp(self):
 		self.browser = webdriver.Firefox()
@@ -19,7 +20,7 @@ class NewVisitorTest(unittest.TestCase):
 	def test_can_start_a_list_and_retrieve_it_later(self):
 		# Edith has heard about a cool new online app with famous quotes. She goes
 		# to check out its homepage
-		self.browser.get('http://localhost:8000')
+		self.browser.get(self.live_server_url)
 
 		# She notices the page title and header mention wise words
 		self.assertIn('Wise Words', self.browser.title)
@@ -58,6 +59,3 @@ class NewVisitorTest(unittest.TestCase):
 
 		# Satisfied, she goes back to sleep
 		self.fail('Finish the test!')
-
-if __name__ == '__main__':
-	unittest.main(warnings='ignore')
