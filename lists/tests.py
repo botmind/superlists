@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.http import HttpRequest
 
 from lists.views import home_page
-from lists.models import Quote
+from lists.models import Quote, Author
 
 class HomePageTest(TestCase):
 
@@ -25,25 +25,34 @@ class QuoteViewTest (TestCase):
 		self.assertTemplateUsed(response, 'quotes.html')
 
 	def test_displays_all_items(self):
-		Quote.objects.create(text='quote 1')
-		Quote.objects.create(text='quote 2')
+		author = Author.objects.create()
+		Quote.objects.create(text='quote 1', author=author)
+		Quote.objects.create(text='quote 2', author=author)
 
 		response = self.client.get('/quotes/quote-list/')
 
 		self.assertContains(response, 'quote 1')
 		self.assertContains(response, 'quote 2')
 
-class QuoteModelTest(TestCase):
+class AuthorAndQuoteModelTest(TestCase):
 	
 	def test_saving_and_retrieving_items(self):
 
+		author = Author()
+		author.save()
+
 		first_quote = Quote()
 		first_quote.text = "I am the alpha and the omega."
+		first_quote.author = author
 		first_quote.save()
 
 		second_quote = Quote()
 		second_quote.text = "I second that emotion."
+		second_quote.author = author
 		second_quote.save()
+
+		saved_author = Author.objects.first()
+		self.assertEqual(saved_author, author)
 
 		saved_quotes = Quote.objects.all()
 		self.assertEqual(saved_quotes.count(), 2)
@@ -51,7 +60,9 @@ class QuoteModelTest(TestCase):
 		first_saved_quote = saved_quotes[0]
 		second_saved_quote = saved_quotes[1]
 		self.assertEqual(first_saved_quote.text, "I am the alpha and the omega.")
+		self.assertEqual(first_saved_quote.author, author)
 		self.assertEqual(second_saved_quote.text, "I second that emotion.")
+		self.assertEqual(second_saved_quote.author, author)
 
 class NewQuoteTest(TestCase):
 
