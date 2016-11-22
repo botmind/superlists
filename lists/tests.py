@@ -18,32 +18,6 @@ class HomePageTest(TestCase):
 		expected_html = render_to_string('home.html')
 		self.assertEqual(response.content.decode(), expected_html) #make sure the HTML received in the response is identical to the template; decode converts the bytes into a string
 
-	def test_home_page_can_save_a_POST_request(self):
-		request = HttpRequest()
-		request.method = 'POST'
-		request.POST['quote_text'] = 'I think, therefore I am.'
-
-		response = home_page(request)
-
-		self.assertEqual(Quote.objects.count(), 1)
-		new_quote = Quote.objects.first()
-		self.assertEqual('I think, therefore I am.', new_quote.text)
-
-	def test_home_page_redirects_after_POST(self):
-		request = HttpRequest()
-		request.method = 'POST'
-		request.POST['quote_text'] = 'I think, therefore I am.'
-
-		response = home_page(request)
-
-		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response['location'], '/quotes/quote-list')
-
-	def test_home_page_only_saves_items_when_necessary(self):
-		request = HttpRequest()
-		home_page(request)
-		self.assertEqual(Quote.objects.count(), 0)
-
 class QuoteViewTest (TestCase):
 
 	def test_uses_quote_template(self):
@@ -78,3 +52,16 @@ class QuoteModelTest(TestCase):
 		second_saved_quote = saved_quotes[1]
 		self.assertEqual(first_saved_quote.text, "I am the alpha and the omega.")
 		self.assertEqual(second_saved_quote.text, "I second that emotion.")
+
+class NewQuoteTest(TestCase):
+
+	def test_saving_a_POST_request(self):
+		self.client.post('/quotes/new', data={'quote_text': 'I think, therefore I am.'})
+
+		self.assertEqual(Quote.objects.count(), 1)
+		new_quote = Quote.objects.first()
+		self.assertEqual('I think, therefore I am.', new_quote.text)
+
+	def test_redirects_after_POST(self):
+		response = self.client.post('/quotes/new', data={'quote_text': 'I think, therefore I am.'})
+		self.assertRedirects(response, '/quotes/quote-list/')
