@@ -4,9 +4,15 @@
 	</head>
 	<body>
 		<h1>Enter some Wise Words</h1>
-		<form method="POST">
+		<form method="POST" action="/">
 			<input name="quote_text" id="id_new_quote" placeholder="Enter a new quote"></input>	
 			{% csrf_token %}
 		</form>
+		
+		<table id="id_quote_table">
+			{% for quote in quotes %}
+				<tr><td>{{ quote.text }}</td></tr>
+			{% endfor %}
+		</table>
 	</body>
 </html>

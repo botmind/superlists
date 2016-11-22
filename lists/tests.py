@@ -44,15 +44,20 @@ class HomePageTest(TestCase):
 		home_page(request)
 		self.assertEqual(Quote.objects.count(), 0)
 
-	def test_home_page_displays_all_list_items(self):
+class QuoteViewTest (TestCase):
+
+	def test_uses_quote_template(self):
+		response = self.client.get('/quotes/quote-list/')
+		self.assertTemplateUsed(response, 'quotes.html')
+
+	def test_displays_all_items(self):
 		Quote.objects.create(text='quote 1')
 		Quote.objects.create(text='quote 2')
 
-		request = HttpRequest()
-		response = home_page(request)
+		response = self.client.get('/quotes/quote-list/')
 
-		self.assertIn('quote 1', response.content.decode())
-		self.assertIn('quote 2', response.content.decode())
+		self.assertContains(response, 'quote 1')
+		self.assertContains(response, 'quote 2')
 
 class QuoteModelTest(TestCase):
 	
