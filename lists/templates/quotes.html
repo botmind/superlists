@@ -4,13 +4,13 @@
 	</head>
 	<body>
 		<h1>Enter some Wise Words</h1>
-		<form method="POST" action="/quotes/new">
+		<form method="POST" action="/quotes/{{ author.id }}/add_quote">
 			<input name="quote_text" id="id_new_quote" placeholder="Enter a new quote"></input>	
 			{% csrf_token %}
 		</form>
 		
 		<table id="id_quote_table">
-			{% for quote in quotes %}
+			{% for quote in author.quote_set.all %}
 				<tr><td>{{ quote.text }}</td></tr>
 			{% endfor %}
 		</table>
