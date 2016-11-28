@@ -4,8 +4,8 @@
 {% block form_action %}/quotes/{{ author.id }}/add_quote{% endblock %}
 
 {%block table %}
-	<table id="id_quote_table">
-		{% for quote in author.item_set.all %}
+	<table id="id_quote_table" class="table">
+		{% for quote in author.quote_set.all %}
 			<tr><td>{{ quote.text }}</td></tr>
 		{% endfor %}
 	</table>
