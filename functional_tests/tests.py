@@ -83,3 +83,18 @@ class NewVisitorTest(LiveServerTestCase):
 		self.assertIn('The pen is mightier than the sword.', page_text)
 
 		#Satisfied, they both go to sleep
+
+	def test_layout_and_styling(self):
+		#visit the home page
+		self.browser.get(self.live_server_url)
+		self.browser.set_window_size(1024, 768)
+
+		#input box is centred
+		inputbox = self.browser.find_element_by_id('id_new_quote')
+		self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=10)
+
+		#enter a new quote
+		inputbox.send_keys('A new quote\n')
+		inputbox = self.browser.find_element_by_id('id_new_quote')
+		self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=10)
+
