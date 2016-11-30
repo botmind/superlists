@@ -1,1 +1,1 @@
-Django==1.8.16
+Django==1.8.16gunicorn==19.6.0
