@@ -1,38 +1,10 @@
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import sys
 
+class NewVisitorTest(FunctionalTest):
 
-class NewVisitorTest(StaticLiveServerTestCase):
-
-	@classmethod
-	def setUpClass(cls):
-		for arg in sys.argv:
-			if 'liveserver=botmind.tk' in arg:
-				cls.server_url = 'http://botmind.tk'
-				return
-		super().setUpClass()
-		cls.server_url = cls.live_server_url
-
-	@classmethod
-	def tearDownClass(cls):
-		if cls.server_url == cls.live_server_url:
-			super().tearDownClass()
-
-	def setUp(self):
-		self.browser = webdriver.Firefox()
-		self.browser.implicitly_wait(3)
-
-	def tearDown(self):
-		self.browser.quit()
-
-	def check_for_row_in_list_table(self, row_text):
-		table = self.browser.find_element_by_id('id_quote_table')
-		rows = table.find_elements_by_tag_name('tr')
-		self.assertIn(row_text, [row.text for row in rows])
-
-	def test_can_start_a_list_and_retrieve_it_later(self):
+	def test_can_start_a_list_for_one_user(self):
 		# Edith has heard about a cool new online app with famous quotes. She goes
 		# to check out its homepage
 		self.browser.get(self.server_url)
@@ -68,6 +40,19 @@ class NewVisitorTest(StaticLiveServerTestCase):
 		self.check_for_row_in_list_table('I think, therefore I am.')
 		self.check_for_row_in_list_table('Man is a rational animal.')
 
+	def test_multiple_users_can_start_lists_at_different_urls(self):
+		#Edith enters a new quote
+
+		self.browser.get(self.server_url)
+		inputbox = self.browser.find_element_by_id('id_new_quote')
+		inputbox.send_keys('I think, therefore I am.\n')
+		self.check_for_row_in_list_table('I think, therefore I am.')
+
+		#her list has a unique URL
+
+		edith_list_url = self.browser.current_url
+		self.assertRegex(edith_list_url, '/quotes/.+')
+
 		# A new user, Francis, comes to the site.
 
 		## We use a new session to make sure no information
@@ -98,18 +83,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
 		self.assertIn('The pen is mightier than the sword.', page_text)
 
 		#Satisfied, they both go to sleep
-
-	def test_layout_and_styling(self):
-		#visit the home page
-		self.browser.get(self.server_url)
-		self.browser.set_window_size(1024, 768)
-
-		#input box is centred
-		inputbox = self.browser.find_element_by_id('id_new_quote')
-		self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=10)
-
-		#enter a new quote
-		inputbox.send_keys('A new quote\n')
-		inputbox = self.browser.find_element_by_id('id_new_quote')
-		self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=10)
-
