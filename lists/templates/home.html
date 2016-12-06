@@ -1,4 +1,4 @@
 {% extends 'base.html' %}
 
 {% block header_text %}Wise Words{% endblock %}
-{% block form_action %}/quotes/new{% endblock %}
+{% block form_action %}{% url 'new_quote' %}{% endblock %}
