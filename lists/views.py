@@ -8,10 +8,17 @@ def home_page(request):
 
 def view_quote(request, author_id):
 	author = Author.objects.get(id=author_id) #retrieve the author using the id
+	error = None #error will be empty if this is a view request
 	if request.method == 'POST':
-		Quote.objects.create(text=request.POST['quote_text'], author=author)
-		return redirect('/quotes/%d/' % (author.id))
-	return render(request, 'quotes.html', {'author': author})
+		try:
+			quote = Quote(text=request.POST['quote_text'], author=author)
+			quote.full_clean()
+			quote.save()
+			return redirect('/quotes/%d/' % (author.id))
+		except ValidationError:
+			error = "You can't submit a quote with no text!"
+
+	return render(request, 'quotes.html', {'author': author, 'error': error})
 
 def new_quote(request):
 	author = Author.objects.create()

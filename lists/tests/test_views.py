@@ -65,6 +65,15 @@ class QuoteViewTest (TestCase):
 
 		self.assertRedirects(response, '/quotes/%d/' % (correct_author.id))
 
+	def test_validation_errors_end_up_on_quotes_page(self):
+		author = Author.objects.create()
+		response = self.client.post('/quotes/%d/' % (author.id), data={'quote_text': ''})
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'quotes.html')
+		expected_error = escape("You can't submit a quote with no text!")
+		self.assertContains(response, expected_error)
+
+
 class NewQuoteTest(TestCase):
 
 	def test_saving_a_POST_request(self):
