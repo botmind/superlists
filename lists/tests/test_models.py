@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.exceptions import ValidationError
 from lists.models import Quote, Author
 
 
@@ -31,3 +32,10 @@ class AuthorAndQuoteModelTest(TestCase):
 		self.assertEqual(first_saved_quote.author, author)
 		self.assertEqual(second_saved_quote.text, "I second that emotion.")
 		self.assertEqual(second_saved_quote.author, author)
+
+	def test_cannot_save_empty_quotes(self):
+		author = Author.objects.create()
+		quote = Quote.objects.create(author=author, text='')
+		with self.assertRaises(ValidationError):
+			quote.save()
+			quote.full_clean()

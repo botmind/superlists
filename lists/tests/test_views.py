@@ -1,3 +1,4 @@
+from django.utils.html import escape
 from django.template.loader import render_to_string
 from django.core.urlresolvers import resolve
 from django.test import TestCase
@@ -77,3 +78,15 @@ class NewQuoteTest(TestCase):
 		response = self.client.post('/quotes/%d/add_quote' % (correct_author.id), data={'quote_text': 'A new quote for an existing author'})
 
 		self.assertRedirects(response, '/quotes/%d/' % (correct_author.id))
+
+	def test_validation_errors_are_sent_back_to_home_page_template(self):
+		response = self.client.post('/quotes/new', data={'quote_text': ''})
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'home.html')
+		expected_error = escape("You can't submit a quote with no text!")
+		self.assertContains(response, expected_error)
+
+	def test_invalid_quotes_arent_saved(self):
+		self.client.post('/quotes/new', data={'quote_text': ''})
+		self.assertEqual(Author.objects.count(), 0)
+		self.assertEqual(Quote.objects.count(), 0)
