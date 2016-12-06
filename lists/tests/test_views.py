@@ -47,6 +47,24 @@ class QuoteViewTest (TestCase):
 		response = self.client.get('/quotes/%d/' % (correct_author.id))
 		self.assertEqual(response.context['author'], correct_author)
 
+	def test_can_save_a_POST_request_to_an_existing_list(self):
+		other_author = Author.objects.create()
+		correct_author = Author.objects.create()
+
+		self.client.post('/quotes/%d/' % (correct_author.id), data={'quote_text': 'A new quote for an existing author'})
+		self.assertEqual(Quote.objects.count(), 1)
+		new_quote = Quote.objects.first()
+		self.assertEqual(new_quote.text, 'A new quote for an existing author')
+		self.assertEqual(new_quote.author, correct_author)
+
+	def test_POST_redirects_to_quote_view(self):
+		other_author = Author.objects.create()
+		correct_author = Author.objects.create()
+
+		response = self.client.post('/quotes/%d/' % (correct_author.id), data={'quote_text': 'A new quote for an existing author'})
+
+		self.assertRedirects(response, '/quotes/%d/' % (correct_author.id))
+
 class NewQuoteTest(TestCase):
 
 	def test_saving_a_POST_request(self):
@@ -60,24 +78,6 @@ class NewQuoteTest(TestCase):
 		response = self.client.post('/quotes/new', data={'quote_text': 'I think, therefore I am.'})
 		new_author = Author.objects.first()
 		self.assertRedirects(response, '/quotes/%d/' % (new_author.id))
-
-	def test_can_save_a_POST_request_to_an_existing_list(self):
-		other_author = Author.objects.create()
-		correct_author = Author.objects.create()
-
-		self.client.post('/quotes/%d/add_quote' % (correct_author.id), data={'quote_text': 'A new quote for an existing author'})
-		self.assertEqual(Quote.objects.count(), 1)
-		new_quote = Quote.objects.first()
-		self.assertEqual(new_quote.text, 'A new quote for an existing author')
-		self.assertEqual(new_quote.author, correct_author)
-
-	def test_redirects_to_quote_view(self):
-		other_author = Author.objects.create()
-		correct_author = Author.objects.create()
-
-		response = self.client.post('/quotes/%d/add_quote' % (correct_author.id), data={'quote_text': 'A new quote for an existing author'})
-
-		self.assertRedirects(response, '/quotes/%d/' % (correct_author.id))
 
 	def test_validation_errors_are_sent_back_to_home_page_template(self):
 		response = self.client.post('/quotes/new', data={'quote_text': ''})
