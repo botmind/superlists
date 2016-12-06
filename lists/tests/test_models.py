@@ -39,3 +39,7 @@ class AuthorAndQuoteModelTest(TestCase):
 		with self.assertRaises(ValidationError):
 			quote.save()
 			quote.full_clean()
+
+	def test_get_absolute_url(self):
+		author = Author.objects.create()
+		self.assertEqual(author.get_absolute_url(), '/quotes/%d/' % (author.id))

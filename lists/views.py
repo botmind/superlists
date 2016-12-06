@@ -14,7 +14,7 @@ def view_quote(request, author_id):
 			quote = Quote(text=request.POST['quote_text'], author=author)
 			quote.full_clean()
 			quote.save()
-			return redirect('/quotes/%d/' % (author.id))
+			return redirect(author) #gets '/quotes/%d/' % (author.id) using the get_absolute_url fn in the Author model
 		except ValidationError:
 			error = "You can't submit a quote with no text!"
 
@@ -30,4 +30,4 @@ def new_quote(request):
 		author.delete() #if the quote does not pass the validation tests, remove the extraneous author
 		error = "You can't submit a quote with no text!"
 		return render(request, 'home.html', {"error": error})
-	return redirect('/quotes/%d/' % (author.id))
+	return redirect(author) #gets '/quotes/%d/' % (author.id) using the get_absolute_url fn in the Author model
