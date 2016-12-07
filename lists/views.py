@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
 from lists.models import Quote, Author
+from lists.forms import QuoteForm
 
 # Create your views here.
 def home_page(request):
-	return render(request, 'home.html')
+	return render(request, 'home.html', {'form': QuoteForm()})
 
 def view_quote(request, author_id):
 	author = Author.objects.get(id=author_id) #retrieve the author using the id
