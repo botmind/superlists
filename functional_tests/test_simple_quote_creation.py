@@ -16,7 +16,7 @@ class NewVisitorTest(FunctionalTest):
 		
 
 		# She is invited to enter a new quotation straight away
-		inputbox = self.browser.find_element_by_id('id_new_quote')
+		inputbox = self.get_quote_input_box()
 		self.assertEqual(inputbox.get_attribute('placeholder'), 'Enter a new quote')
 
 		# She types "I think, therefore I am." into a text box
@@ -32,7 +32,7 @@ class NewVisitorTest(FunctionalTest):
 
 		# There is still a text box inviting her to add another quote. She
 		# enters "Man is a rational animal."
-		inputbox = self.browser.find_element_by_id('id_new_quote')
+		inputbox = self.get_quote_input_box()
 		inputbox.send_keys('Man is a rational animal.')
 		inputbox.send_keys(Keys.ENTER)
 
@@ -44,7 +44,7 @@ class NewVisitorTest(FunctionalTest):
 		#Edith enters a new quote
 
 		self.browser.get(self.server_url)
-		inputbox = self.browser.find_element_by_id('id_new_quote')
+		inputbox = self.get_quote_input_box()
 		inputbox.send_keys('I think, therefore I am.\n')
 		self.check_for_row_in_list_table('I think, therefore I am.')
 
@@ -68,7 +68,7 @@ class NewVisitorTest(FunctionalTest):
 		self.assertNotIn('Man is a rational animal.', page_text)
 
 		#Francis enters a new quote.
-		inputbox = self.browser.find_element_by_id('id_new_quote')
+		inputbox = self.get_quote_input_box()
 		inputbox.send_keys('The pen is mightier than the sword.')
 		inputbox.send_keys(Keys.ENTER)
 

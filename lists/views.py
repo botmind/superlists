@@ -12,7 +12,7 @@ def view_quote(request, author_id):
 	error = None #error will be empty if this is a view request
 	if request.method == 'POST':
 		try:
-			quote = Quote(text=request.POST['quote_text'], author=author)
+			quote = Quote(text=request.POST['text'], author=author)
 			quote.full_clean()
 			quote.save()
 			return redirect(author) #gets '/quotes/%d/' % (author.id) using the get_absolute_url fn in the Author model
@@ -23,7 +23,7 @@ def view_quote(request, author_id):
 
 def new_quote(request):
 	author = Author.objects.create()
-	quote = Quote(text=request.POST['quote_text'], author=author)
+	quote = Quote(text=request.POST['text'], author=author)
 	try:
 		quote.full_clean()
 		quote.save() #only save the quote if it passes all validations

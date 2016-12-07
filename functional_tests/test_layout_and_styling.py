@@ -8,10 +8,10 @@ class LayoutAndStylingTest(FunctionalTest):
 		self.browser.set_window_size(1024, 768)
 
 		#input box is centred
-		inputbox = self.browser.find_element_by_id('id_new_quote')
+		inputbox = self.get_quote_input_box()
 		self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=10)
 
 		#enter a new quote
 		inputbox.send_keys('A new quote\n')
-		inputbox = self.browser.find_element_by_id('id_new_quote')
+		inputbox = self.get_quote_input_box()
 		self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=10)

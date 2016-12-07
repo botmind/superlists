@@ -18,7 +18,7 @@ class HomePageTest(TestCase):
 		request = HttpRequest()
 		response = home_page(request)
 		expected_html = render_to_string('home.html', {'form': QuoteForm()})
-		print(expected_html)
+		#print(expected_html)
 		self.assertEqual(response.content.decode(), expected_html) #make sure the HTML received in the response is identical to the template; decode converts the bytes into a string
 
 	def test_home_page_uses_quote_form(self):
@@ -57,7 +57,7 @@ class QuoteViewTest (TestCase):
 		other_author = Author.objects.create()
 		correct_author = Author.objects.create()
 
-		self.client.post('/quotes/%d/' % (correct_author.id), data={'quote_text': 'A new quote for an existing author'})
+		self.client.post('/quotes/%d/' % (correct_author.id), data={'text': 'A new quote for an existing author'})
 		self.assertEqual(Quote.objects.count(), 1)
 		new_quote = Quote.objects.first()
 		self.assertEqual(new_quote.text, 'A new quote for an existing author')
@@ -67,13 +67,13 @@ class QuoteViewTest (TestCase):
 		other_author = Author.objects.create()
 		correct_author = Author.objects.create()
 
-		response = self.client.post('/quotes/%d/' % (correct_author.id), data={'quote_text': 'A new quote for an existing author'})
+		response = self.client.post('/quotes/%d/' % (correct_author.id), data={'text': 'A new quote for an existing author'})
 
 		self.assertRedirects(response, '/quotes/%d/' % (correct_author.id))
 
 	def test_validation_errors_end_up_on_quotes_page(self):
 		author = Author.objects.create()
-		response = self.client.post('/quotes/%d/' % (author.id), data={'quote_text': ''})
+		response = self.client.post('/quotes/%d/' % (author.id), data={'text': ''})
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'quotes.html')
 		expected_error = escape("You can't submit a quote with no text!")
@@ -83,25 +83,25 @@ class QuoteViewTest (TestCase):
 class NewQuoteTest(TestCase):
 
 	def test_saving_a_POST_request(self):
-		self.client.post('/quotes/new', data={'quote_text': 'I think, therefore I am.'})
+		self.client.post('/quotes/new', data={'text': 'I think, therefore I am.'})
 
 		self.assertEqual(Quote.objects.count(), 1)
 		new_quote = Quote.objects.first()
 		self.assertEqual('I think, therefore I am.', new_quote.text)
 
 	def test_redirects_after_POST(self):
-		response = self.client.post('/quotes/new', data={'quote_text': 'I think, therefore I am.'})
+		response = self.client.post('/quotes/new', data={'text': 'I think, therefore I am.'})
 		new_author = Author.objects.first()
 		self.assertRedirects(response, '/quotes/%d/' % (new_author.id))
 
 	def test_validation_errors_are_sent_back_to_home_page_template(self):
-		response = self.client.post('/quotes/new', data={'quote_text': ''})
+		response = self.client.post('/quotes/new', data={'text': ''})
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'home.html')
 		expected_error = escape("You can't submit a quote with no text!")
 		self.assertContains(response, expected_error)
 
 	def test_invalid_quotes_arent_saved(self):
-		self.client.post('/quotes/new', data={'quote_text': ''})
+		self.client.post('/quotes/new', data={'text': ''})
 		self.assertEqual(Author.objects.count(), 0)
 		self.assertEqual(Quote.objects.count(), 0)
