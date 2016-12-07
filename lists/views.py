@@ -13,7 +13,7 @@ def view_quote(request, author_id):
 	if request.method == 'POST':
 		form = QuoteForm(data=request.POST)
 		if form.is_valid():
-			Quote.objects.create(text=request.POST['text'], author=author)
+			form.save(for_author=author)
 			return redirect(author) #gets '/quotes/%d/' % (author.id) using the get_absolute_url fn in the Author model
 	return render(request, 'quotes.html', {'author': author, 'form': form})
 
@@ -21,7 +21,7 @@ def new_quote(request):
 	form = QuoteForm(data=request.POST)
 	if form.is_valid():
 		author = Author.objects.create()
-		Quote.objects.create(text=request.POST['text'], author=author)
+		form.save(for_author=author)
 		return redirect(author) #gets '/quotes/%d/' % (author.id) using the get_absolute_url fn in the Author model
 	else:
 		return render(request, 'home.html', {'form': form})
