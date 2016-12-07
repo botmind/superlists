@@ -8,27 +8,20 @@ def home_page(request):
 	return render(request, 'home.html', {'form': QuoteForm()})
 
 def view_quote(request, author_id):
-	author = Author.objects.get(id=author_id) #retrieve the author using the id
-	error = None #error will be empty if this is a view request
+	author = Author.objects.get(id=author_id) #retrieve the author using the id passed in as part of the URL
+	form = QuoteForm()
 	if request.method == 'POST':
-		try:
-			quote = Quote(text=request.POST['text'], author=author)
-			quote.full_clean()
-			quote.save()
+		form = QuoteForm(data=request.POST)
+		if form.is_valid():
+			Quote.objects.create(text=request.POST['text'], author=author)
 			return redirect(author) #gets '/quotes/%d/' % (author.id) using the get_absolute_url fn in the Author model
-		except ValidationError:
-			error = "You can't submit a quote with no text!"
-
-	return render(request, 'quotes.html', {'author': author, 'error': error})
+	return render(request, 'quotes.html', {'author': author, 'form': form})
 
 def new_quote(request):
-	author = Author.objects.create()
-	quote = Quote(text=request.POST['text'], author=author)
-	try:
-		quote.full_clean()
-		quote.save() #only save the quote if it passes all validations
-	except ValidationError:
-		author.delete() #if the quote does not pass the validation tests, remove the extraneous author
-		error = "You can't submit a quote with no text!"
-		return render(request, 'home.html', {"error": error})
-	return redirect(author) #gets '/quotes/%d/' % (author.id) using the get_absolute_url fn in the Author model
+	form = QuoteForm(data=request.POST)
+	if form.is_valid():
+		author = Author.objects.create()
+		Quote.objects.create(text=request.POST['text'], author=author)
+		return redirect(author) #gets '/quotes/%d/' % (author.id) using the get_absolute_url fn in the Author model
+	else:
+		return render(request, 'home.html', {'form': form})

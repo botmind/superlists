@@ -6,7 +6,7 @@ from django.http import HttpRequest
 
 from lists.views import home_page
 from lists.models import Quote, Author
-from lists.forms import QuoteForm
+from lists.forms import QuoteForm, EMPTY_QUOTE_ERROR
 
 class HomePageTest(TestCase):
 
@@ -71,13 +71,26 @@ class QuoteViewTest (TestCase):
 
 		self.assertRedirects(response, '/quotes/%d/' % (correct_author.id))
 
-	def test_validation_errors_end_up_on_quotes_page(self):
+	def post_invalid_input(self):
 		author = Author.objects.create()
-		response = self.client.post('/quotes/%d/' % (author.id), data={'text': ''})
+		return self.client.post('/quotes/%d/' % (author.id), data={'text': ''})
+
+	def test_for_invalid_input_nothing_saved_to_db(self):
+		self.post_invalid_input()
+		self.assertEqual(Quote.objects.count(), 0)
+
+	def test_for_invalid_input_renders_quote_template(self):
+		response = self.post_invalid_input()
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'quotes.html')
-		expected_error = escape("You can't submit a quote with no text!")
-		self.assertContains(response, expected_error)
+
+	def test_for_invalid_input_passes_form_to_template(self):
+		response = self.post_invalid_input()
+		self.assertIsInstance(response.context['form'], QuoteForm)
+
+	def test_for_invalid_input_shows_error_on_page(self):
+		response = self.post_invalid_input()
+		self.assertContains(response, escape(EMPTY_QUOTE_ERROR))
 
 
 class NewQuoteTest(TestCase):
@@ -94,12 +107,19 @@ class NewQuoteTest(TestCase):
 		new_author = Author.objects.first()
 		self.assertRedirects(response, '/quotes/%d/' % (new_author.id))
 
-	def test_validation_errors_are_sent_back_to_home_page_template(self):
+	def test_for_invalid_input_renders_home_template(self):
 		response = self.client.post('/quotes/new', data={'text': ''})
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'home.html')
-		expected_error = escape("You can't submit a quote with no text!")
-		self.assertContains(response, expected_error)
+
+	def test_validation_errors_are_shown_on_home_page(self):
+		response = self.client.post('/quotes/new', data={'text': ''})
+		self.assertContains(response, escape(EMPTY_QUOTE_ERROR))
+
+	def test_for_invalid_input_passes_form_to_template(self):
+		response = self.client.post('/quotes/new', data={'text': ''})
+		self.assertIsInstance(response.context['form'], QuoteForm)
+
 
 	def test_invalid_quotes_arent_saved(self):
 		self.client.post('/quotes/new', data={'text': ''})
