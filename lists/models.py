@@ -11,3 +11,10 @@ class Quote(models.Model):
 	text = models.TextField(default='')
 	author = models.ForeignKey(Author, default=None)
 
+	def __str__(self):
+		return self.text
+
+	class Meta:
+		ordering = ('id',)
+		unique_together = ('author', 'text')
+
