@@ -6,7 +6,7 @@ from django.http import HttpRequest
 
 from lists.views import home_page
 from lists.models import Quote, Author
-from lists.forms import QuoteForm, EMPTY_QUOTE_ERROR
+from lists.forms import QuoteForm, EMPTY_QUOTE_ERROR, DUPLICATE_QUOTE_ERROR, ExistingAuthorQuoteForm
 
 from unittest import skip
 
@@ -77,6 +77,12 @@ class QuoteViewTest (TestCase):
 		author = Author.objects.create()
 		return self.client.post('/quotes/%d/' % (author.id), data={'text': ''})
 
+	def test_displays_quote_form(self):
+		author = Author.objects.create()
+		response = self.client.get('/quotes/%d/' % (author.id))
+		self.assertIsInstance(response.context['form'], ExistingAuthorQuoteForm)
+		self.assertContains(response, 'name="text"')
+
 	def test_for_invalid_input_nothing_saved_to_db(self):
 		self.post_invalid_input()
 		self.assertEqual(Quote.objects.count(), 0)
@@ -88,19 +94,18 @@ class QuoteViewTest (TestCase):
 
 	def test_for_invalid_input_passes_form_to_template(self):
 		response = self.post_invalid_input()
-		self.assertIsInstance(response.context['form'], QuoteForm)
+		self.assertIsInstance(response.context['form'], ExistingAuthorQuoteForm)
 
 	def test_for_invalid_input_shows_error_on_page(self):
 		response = self.post_invalid_input()
 		self.assertContains(response, escape(EMPTY_QUOTE_ERROR))
 
-	@skip
+	
 	def test_duplicate_quote_validation_errors_display_on_quotes_page(self):
 		author1 = Author.objects.create()
 		quote1 = Quote.objects.create(author=author1, text='q1')
 		response = self.client.post('/quotes/%d/' % (author1.id), data={'text': 'q1'})
-		expected_error = escape("This quote already exists.")
-		self.assertContains(response, expected_error)
+		self.assertContains(response, escape(DUPLICATE_QUOTE_ERROR))
 		self.assertTemplateUsed(response, 'quotes.html')
 		self.assertEqual(Quote.objects.all().count(), 1)
 

@@ -41,3 +41,9 @@ class ExistingAuthorQuoteFormTest(TestCase):
 		form = ExistingAuthorQuoteForm(for_author=author, data={'text': 'no dupes'})
 		self.assertFalse(form.is_valid())
 		self.assertEqual(form.errors['text'], [DUPLICATE_QUOTE_ERROR])
+
+	def test_form_save(self):
+		author = Author.objects.create()
+		form = ExistingAuthorQuoteForm(for_author=author, data={'text': 'quote'})
+		new_quote = form.save()
+		self.assertEqual(new_quote, Quote.objects.all()[0])

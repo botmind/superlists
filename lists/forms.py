@@ -36,3 +36,6 @@ class ExistingAuthorQuoteForm(QuoteForm):
 		except ValidationError as e:
 			e.error_dict = {'text': [DUPLICATE_QUOTE_ERROR]}
 			self._update_errors(e)
+
+	def save(self):
+		return forms.models.ModelForm.save(self) #call the grandparent class save method (with no for_author, since this is already taken care of in init)
