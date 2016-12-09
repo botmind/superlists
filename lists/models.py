@@ -16,5 +16,5 @@ class Quote(models.Model):
 
 	class Meta:
 		ordering = ('id',)
-		unique_together = ('author', 'text')
+		unique_together = ('author', 'text') #ensure duplicate quotes for the same author cannot be saved to the DB
 

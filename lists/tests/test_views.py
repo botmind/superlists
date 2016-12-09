@@ -8,6 +8,8 @@ from lists.views import home_page
 from lists.models import Quote, Author
 from lists.forms import QuoteForm, EMPTY_QUOTE_ERROR
 
+from unittest import skip
+
 class HomePageTest(TestCase):
 
 	def test_root_url_resolves_to_home_page_view(self):
@@ -91,6 +93,16 @@ class QuoteViewTest (TestCase):
 	def test_for_invalid_input_shows_error_on_page(self):
 		response = self.post_invalid_input()
 		self.assertContains(response, escape(EMPTY_QUOTE_ERROR))
+
+	@skip
+	def test_duplicate_quote_validation_errors_display_on_quotes_page(self):
+		author1 = Author.objects.create()
+		quote1 = Quote.objects.create(author=author1, text='q1')
+		response = self.client.post('/quotes/%d/' % (author1.id), data={'text': 'q1'})
+		expected_error = escape("This quote already exists.")
+		self.assertContains(response, expected_error)
+		self.assertTemplateUsed(response, 'quotes.html')
+		self.assertEqual(Quote.objects.all().count(), 1)
 
 
 class NewQuoteTest(TestCase):
