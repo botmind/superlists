@@ -2,13 +2,16 @@ from .base import FunctionalTest
 
 class QuoteValidationTest(FunctionalTest):
 
+	def get_error_element(self):
+		return self.browser.find_element_by_css_selector('.has-error')
+
 	def test_cannot_add_empty_quotes(self):
 		#user hits enter on empty input box
 		self.browser.get(self.server_url)
 		self.get_quote_input_box().send_keys('\n')
 
 		#home page refreshes; error message flashes: quotes cannot be blank
-		error = self.browser.find_element_by_css_selector('.has-error')
+		error = self.get_error_element()
 		self.assertEqual(error.text, "You can't submit a quote with no text!")
 
 		#user enters a quote; everything works
@@ -20,7 +23,7 @@ class QuoteValidationTest(FunctionalTest):
 
 		#error message flashes again
 		self.check_for_row_in_list_table('Quote 1')
-		error = self.browser.find_element_by_css_selector('.has-error')
+		error = self.get_error_element()
 		self.assertEqual(error.text, "You can't submit a quote with no text!")
 
 		#user fills in text to correct error
@@ -39,7 +42,24 @@ class QuoteValidationTest(FunctionalTest):
 
 		#error message is displayed
 		self.check_for_row_in_list_table('Quote 1')
-		error = self.browser.find_element_by_css_selector('.has-error')
+		error = self.get_error_element()
 		self.assertEqual(error.text, "This quote already exists.")
+
+	def test_error_messages_cleared_on_input(self):
+		#start a quote and cause a validation error
+		self.browser.get(self.server_url)
+		self.get_quote_input_box().send_keys('quote\n')
+		self.check_for_row_in_list_table('quote')
+		self.get_quote_input_box().send_keys('quote\n')
+
+		error = self.get_error_element()
+		self.assertTrue(error.is_displayed())
+
+		#start typing in the input to clear the error
+		self.get_quote_input_box().send_keys('a')
+
+		#the error message instantly disappears
+		error = self.get_error_element()
+		self.assertFalse(error.is_displayed())
 
 
