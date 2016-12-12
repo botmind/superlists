@@ -62,4 +62,21 @@ class QuoteValidationTest(FunctionalTest):
 		error = self.get_error_element()
 		self.assertFalse(error.is_displayed())
 
+	def test_error_messages_cleared_on_click_in(self):
+		#start a quote and cause a validation error
+		self.browser.get(self.server_url)
+		self.get_quote_input_box().send_keys('quote\n')
+		self.check_for_row_in_list_table('quote')
+		self.get_quote_input_box().send_keys('quote\n')
+
+		error = self.get_error_element()
+		self.assertTrue(error.is_displayed())
+
+		#click into the input to clear the error
+		self.get_quote_input_box().click()
+
+		#the error message instantly disappears
+		error = self.get_error_element()
+		self.assertFalse(error.is_displayed())
+
 
