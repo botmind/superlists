@@ -10,9 +10,8 @@ class QuoteValidationTest(FunctionalTest):
 		self.browser.get(self.server_url)
 		self.get_quote_input_box().send_keys('\n')
 
-		#home page refreshes; error message flashes: quotes cannot be blank
-		error = self.get_error_element()
-		self.assertEqual(error.text, "You can't submit a quote with no text!")
+		#the browser intercepts the request, and does not load the quote page
+		self.assertNotIn('Quote 1', self.browser.find_element_by_tag_name('body').text)
 
 		#user enters a quote; everything works
 		self.get_quote_input_box().send_keys('Quote 1\n')
@@ -21,10 +20,10 @@ class QuoteValidationTest(FunctionalTest):
 		#user tries to submit empty box again
 		self.get_quote_input_box().send_keys('\n')
 
-		#error message flashes again
+		#browser prevents this again
 		self.check_for_row_in_list_table('Quote 1')
-		error = self.get_error_element()
-		self.assertEqual(error.text, "You can't submit a quote with no text!")
+		rows = self.browser.find_elements_by_css_selector('#id_quote_table tr')
+		self.assertEqual(len(rows), 1)
 
 		#user fills in text to correct error
 		self.get_quote_input_box().send_keys('Quote 2\n')

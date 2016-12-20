@@ -16,12 +16,9 @@ class HomePageTest(TestCase):
 		found = resolve('/')
 		self.assertEqual(found.func, home_page)
 
-	def test_home_page_returns_correct_html(self):
-		request = HttpRequest()
-		response = home_page(request)
-		expected_html = render_to_string('home.html', {'form': QuoteForm()})
-		#print(expected_html)
-		self.assertEqual(response.content.decode(), expected_html) #make sure the HTML received in the response is identical to the template; decode converts the bytes into a string
+	def test_home_page_uses_home_template(self):
+		response = self.client.get('/')
+		self.assertTemplateUsed(response, 'home.html')
 
 	def test_home_page_uses_quote_form(self):
 		response = self.client.get('/')
