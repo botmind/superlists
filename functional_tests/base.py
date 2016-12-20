@@ -11,6 +11,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 		for arg in sys.argv:
 			if 'liveserver=botmind.tk' in arg:
 				cls.server_url = 'http://botmind.tk'
+				cls.live_server_url = cls.server_url
 				return
 		super().setUpClass()
 		cls.server_url = cls.live_server_url
