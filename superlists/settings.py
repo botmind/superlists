@@ -108,22 +108,27 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_USE_TLS = True
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
+   'version': 1,
+   'disable_existing_loggers': False,
+   'handlers': {
+       'console': {
+           'level': 'DEBUG',
+           'class': 'logging.StreamHandler',
+       },
+   },
+   'loggers': {
         'django': {
+            'handlers': ['console'],
+        },
+        'accounts': {
+            'handlers': ['console'],
+        },
+        'lists': {
             'handlers': ['console'],
         },
     },
     'root': {'level': 'INFO'},
 }
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
