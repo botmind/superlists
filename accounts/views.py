@@ -12,7 +12,7 @@ def send_login_email(request):
 		reverse('login') + '?token={uid}'.format(uid=str(token.uid))
 	)
 	message_body = 'Use this link to log in:\n\n{url}'.format(url=url)
-	send_mail('Your login link for Wise Words', message_body, 'noreply@wisewords', [email])
+	send_mail('Your login link for Wise Words', message_body, 'noreply@wisewords', [email], fail_silently=False)
 	messages.success(request, "Check your email.  We've sent you a link to log in.")
 	return redirect('/')
 
