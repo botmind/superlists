@@ -103,8 +103,10 @@ USE_L10N = True
 USE_TZ = True
 
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'john.lorenc@gmail.com'
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+EMAIL_HOST_USER = 'john.lorenc.site@gmail.com'
+#EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+EMAIL_HOST_PASSWORD = 'xyx123xy'
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 LOGGING = {
